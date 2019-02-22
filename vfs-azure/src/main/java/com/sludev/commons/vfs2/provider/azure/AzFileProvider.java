@@ -98,6 +98,8 @@ import org.slf4j.LoggerFactory;
 public class AzFileProvider
                   extends AbstractOriginatingFileProvider
 {
+    private boolean useHttps;
+
     private static final Logger log = LoggerFactory.getLogger(AzFileProvider.class);
     
     private static final FileSystemOptions DEFAULT_OPTIONS = new FileSystemOptions();
@@ -142,10 +144,14 @@ public class AzFileProvider
      */
     public AzFileProvider()
     {
+        this(true);
+    }
+
+    public AzFileProvider(boolean useHttps) {
         super();
         setFileNameParser(AzFileNameParser.getInstance());
+        this.useHttps = useHttps;
     }
-    
     /**
      * In the case that we are not sent FileSystemOptions object, we need to have
      * one handy.
@@ -200,8 +206,8 @@ public class AzFileProvider
             String currKey =  UserAuthenticatorUtils.toString(UserAuthenticatorUtils.getData(authData,
                     UserAuthenticationData.PASSWORD, UserAuthenticatorUtils.toChar(genRootName.getPassword())));
         
-            storageCreds = new StorageCredentialsAccountAndKey(currAcct, currKey);           
-            storageAccount = new CloudStorageAccount(storageCreds);
+            storageCreds = new StorageCredentialsAccountAndKey(currAcct, currKey);
+            storageAccount = new CloudStorageAccount(storageCreds, useHttps);
             
             client = storageAccount.createCloudBlobClient();
             
